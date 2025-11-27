@@ -1,7 +1,6 @@
 # 🧰 Avara – Multi-Tool Media Suite
 
 Avara is a powerful, modern, and fully **client-side** web application that offers essential media utilities such as image resizing, PDF conversion, vectorization, and OCR.  
-Everything runs **offline in your browser** — ensuring **privacy, speed, and security**. ⚡🔒
 
 ---
 
@@ -55,8 +54,3 @@ Everything runs **offline in your browser** — ensuring **privacy, speed, and s
 
 ---
 
-## 🚀 Running Locally
-
-No build tools needed. Just open and run.
-
-1. Download or clone the repository:
