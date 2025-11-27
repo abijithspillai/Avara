@@ -54,3 +54,6 @@ Avara is a powerful, modern, and fully **client-side** web application that offe
 
 ---
 
+## Live Link
+  https://avaratool.netlify.app/
+
