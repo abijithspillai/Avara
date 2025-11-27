@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avara | Multi-Tool Suite</title>
+    <link rel="icon" type="image/png" href="avara.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/imagetracerjs@1.2.6/imagetracer_v1.2.6.js"></script>
+    <!-- Added Tesseract.js for OCR -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#4f46e5',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .dark .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .drop-zone {
+            transition: all 0.3s ease;
+            border: 2px dashed #cbd5e1;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .dark .drop-zone {
+            border-color: #475569;
+            background-color: transparent;
+        }
+        
+        .drop-zone.dragover {
+            border-color: #6366f1;
+            background-color: rgba(99, 102, 241, 0.1);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155; 
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #475569; 
+        }
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #6366f1;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        .dark .loader {
+            border-color: #334155;
+            border-top-color: #6366f1;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .draggable-item {
+            cursor: move;
+        }
+        .draggable-item.dragging {
+            opacity: 0.5;
+            border: 2px dashed #6366f1;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50">
+
+    <nav class="sticky top-0 z-50 glass-panel border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center cursor-pointer" onclick="router.navigate('home')">
+                    <img src="avara.png" alt="Avara Logo" class="h-10 w-10 mr-2 object-contain">
+                    <span class="text-xl font-bold tracking-tight">Avara</span>
+                </div>
+                <div class="flex items-center space-x-2 md:space-x-4">
+                    <div class="hidden md:flex space-x-1">
+                        <button onclick="router.navigate('home')" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">Home</button>
+                        <button onclick="router.navigate('resizer')" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">Resizer</button>
+                        <button onclick="router.navigate('pdf')" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">PDF to Img</button>
+                        <button onclick="router.navigate('img2pdf')" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">Img to PDF</button>
+                        <button onclick="router.navigate('vectorizer')" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">Vectorize</button>
+                        <button onclick="router.navigate('ocr')" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">OCR</button>
+                    </div>
+                    
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" aria-label="Toggle Dark Mode">
+                        <i class="ph-bold ph-moon text-xl hidden dark:block"></i>
+                        <i class="ph-bold ph-sun text-xl block dark:hidden"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="flex md:hidden justify-center pb-2 space-x-2 overflow-x-auto">
+                 <button onclick="router.navigate('resizer')" class="whitespace-nowrap px-3 py-1 text-xs rounded-full bg-slate-200 dark:bg-slate-800">Resizer</button>
+                 <button onclick="router.navigate('pdf')" class="whitespace-nowrap px-3 py-1 text-xs rounded-full bg-slate-200 dark:bg-slate-800">PDF to Img</button>
+                 <button onclick="router.navigate('img2pdf')" class="whitespace-nowrap px-3 py-1 text-xs rounded-full bg-slate-200 dark:bg-slate-800">Img to PDF</button>
+                 <button onclick="router.navigate('vectorizer')" class="whitespace-nowrap px-3 py-1 text-xs rounded-full bg-slate-200 dark:bg-slate-800">Vectorize</button>
+                 <button onclick="router.navigate('ocr')" class="whitespace-nowrap px-3 py-1 text-xs rounded-full bg-slate-200 dark:bg-slate-800">OCR</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow container mx-auto px-4 py-8 relative">
+        
+        <div id="view-home" class="view-section fade-in">
+            <div class="text-center py-12 md:py-16">
+                <h1 class="text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-cyan-500 mb-6">
+                    Master Your Media
+                </h1>
+                <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-12">
+                    Powerful, secure client-side tools.
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-7xl mx-auto">
+                    <div onclick="router.navigate('resizer')" class="group glass-panel p-8 rounded-2xl cursor-pointer hover:shadow-xl hover:bg-white dark:hover:bg-slate-800 transition-all transform hover:-translate-y-1">
+                        <div class="w-14 h-14 bg-indigo-100 dark:bg-indigo-500/20 rounded-xl flex items-center justify-center mb-6 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
+                            <i class="ph-bold ph-arrows-out-simple text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Image Resizer</h3>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">Resize JPG, PNG, and WebP instantly with precision.</p>
+                    </div>
+
+                    <div onclick="router.navigate('pdf')" class="group glass-panel p-8 rounded-2xl cursor-pointer hover:shadow-xl hover:bg-white dark:hover:bg-slate-800 transition-all transform hover:-translate-y-1">
+                        <div class="w-14 h-14 bg-pink-100 dark:bg-pink-500/20 rounded-xl flex items-center justify-center mb-6 text-pink-600 dark:text-pink-400 group-hover:scale-110 transition-transform">
+                            <i class="ph-bold ph-file-pdf text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">PDF to Image</h3>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">Convert PDF pages into high-quality images.</p>
+                    </div>
+
+                    <div onclick="router.navigate('img2pdf')" class="group glass-panel p-8 rounded-2xl cursor-pointer hover:shadow-xl hover:bg-white dark:hover:bg-slate-800 transition-all transform hover:-translate-y-1">
+                        <div class="w-14 h-14 bg-emerald-100 dark:bg-emerald-500/20 rounded-xl flex items-center justify-center mb-6 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+                            <i class="ph-bold ph-images text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Images to PDF</h3>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">Combine multiple images into a single PDF document.</p>
+                    </div>
+
+                    <div onclick="router.navigate('vectorizer')" class="group glass-panel p-8 rounded-2xl cursor-pointer hover:shadow-xl hover:bg-white dark:hover:bg-slate-800 transition-all transform hover:-translate-y-1">
+                        <div class="w-14 h-14 bg-amber-100 dark:bg-amber-500/20 rounded-xl flex items-center justify-center mb-6 text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
+                            <i class="ph-bold ph-bezier-curve text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Vectorizer</h3>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">Convert raster images (JPG/PNG) to SVG vectors.</p>
+                    </div>
+
+                    <div onclick="router.navigate('ocr')" class="group glass-panel p-8 rounded-2xl cursor-pointer hover:shadow-xl hover:bg-white dark:hover:bg-slate-800 transition-all transform hover:-translate-y-1">
+                        <div class="w-14 h-14 bg-blue-100 dark:bg-blue-500/20 rounded-xl flex items-center justify-center mb-6 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+                            <i class="ph-bold ph-text-t text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Text Extractor</h3>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">Extract text content from images using OCR.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-resizer" class="view-section hidden fade-in">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold">Image Resizer</h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">Adjust dimensions maintaining quality</p>
+                    </div>
+                    <button onclick="resizerApp.reset()" class="text-sm text-slate-500 hover:text-primary flex items-center transition-colors">
+                        <i class="ph-bold ph-arrow-counter-clockwise mr-1"></i> Reset
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2">
+                        <div id="resizer-drop-zone" class="drop-zone rounded-xl p-8 flex flex-col items-center justify-center min-h-[400px] cursor-pointer relative overflow-hidden">
+                            <input type="file" id="resizer-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/*">
+                            
+                            <div id="resizer-placeholder" class="text-center pointer-events-none">
+                                <div class="w-16 h-16 bg-slate-200 dark:bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="ph-duotone ph-image text-3xl text-slate-400"></i>
+                                </div>
+                                <p class="text-lg font-medium">Drop image here</p>
+                                <p class="text-sm text-slate-500 mt-2">or Paste (Ctrl+V)</p>
+                            </div>
+
+                            <div id="resizer-preview-container" class="hidden w-full h-full flex items-center justify-center">
+                                <img id="resizer-preview" class="max-w-full max-h-[350px] object-contain rounded shadow-lg" src="" alt="Preview">
+                            </div>
+                        </div>
+                        <div id="resizer-info" class="mt-4 flex justify-between text-sm text-slate-500 hidden">
+                            <span>Original: <span id="resizer-original-dims" class="font-mono text-slate-700 dark:text-slate-300">0 x 0</span></span>
+                            <span>Size: <span id="resizer-original-size" class="font-mono text-slate-700 dark:text-slate-300">0 KB</span></span>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-xl h-fit">
+                        <h3 class="text-md font-semibold mb-4 border-b border-slate-200 dark:border-slate-700 pb-2">Settings</h3>
+                        
+                        <div class="space-y-4 opacity-50 pointer-events-none transition-opacity" id="resizer-controls">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-500 mb-1">Width (px)</label>
+                                <input type="number" id="resizer-width" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 transition-colors">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-500 mb-1">Height (px)</label>
+                                <input type="number" id="resizer-height" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 transition-colors">
+                            </div>
+
+                            <div class="flex items-center">
+                                <input type="checkbox" id="resizer-ratio" class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" checked>
+                                <label for="resizer-ratio" class="ml-2 text-sm text-slate-600 dark:text-slate-400 select-none">Maintain aspect ratio</label>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-500 mb-1">Quality: <span id="quality-value">90</span>%</label>
+                                <input type="range" id="resizer-quality" min="1" max="100" value="90" class="w-full h-1 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                            </div>
+
+                            <button id="resizer-download-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-lg transition-all flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                                <i class="ph-bold ph-download-simple mr-2"></i> Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-pdf" class="view-section hidden fade-in">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold">PDF to Image</h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">Extract pages securely</p>
+                    </div>
+                    <button onclick="pdfApp.reset()" class="text-sm text-slate-500 hover:text-primary flex items-center transition-colors">
+                        <i class="ph-bold ph-arrow-counter-clockwise mr-1"></i> Reset
+                    </button>
+                </div>
+
+                <div id="pdf-upload-section">
+                    <div id="pdf-drop-zone" class="drop-zone rounded-xl p-12 flex flex-col items-center justify-center cursor-pointer relative overflow-hidden min-h-[300px]">
+                        <input type="file" id="pdf-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="application/pdf">
+                        <div class="w-16 h-16 bg-pink-100 dark:bg-pink-500/20 rounded-full flex items-center justify-center mb-6">
+                            <i class="ph-duotone ph-file-pdf text-3xl text-pink-500 dark:text-pink-400"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Upload PDF</h3>
+                        <p class="text-slate-500 text-sm text-center">Drag and drop, Paste (Ctrl+V) or click to browse</p>
+                    </div>
+                </div>
+
+                <div id="pdf-results-section" class="hidden">
+                    <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-lg mb-6 border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <div class="flex items-center">
+                            <i class="ph-fill ph-file-pdf text-pink-500 text-2xl mr-3"></i>
+                            <div>
+                                <h4 id="pdf-filename" class="font-medium truncate max-w-[200px] md:max-w-md text-sm">filename.pdf</h4>
+                                <p id="pdf-page-count" class="text-xs text-slate-500">0 pages</p>
+                            </div>
+                        </div>
+                        <button id="pdf-download-all" class="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center">
+                            <i class="ph-bold ph-download-simple mr-2"></i> ZIP
+                        </button>
+                    </div>
+
+                    <div id="pdf-progress-container" class="hidden mb-8">
+                        <div class="flex justify-between text-xs text-slate-500 mb-1">
+                            <span>Processing...</span>
+                            <span id="pdf-progress-text">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
+                            <div id="pdf-progress-bar" class="bg-pink-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div id="pdf-gallery" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-img2pdf" class="view-section hidden fade-in">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold">Images to PDF</h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">Combine images into a document</p>
+                    </div>
+                    <button onclick="imgToPdfApp.reset()" class="text-sm text-slate-500 hover:text-primary flex items-center transition-colors">
+                        <i class="ph-bold ph-arrow-counter-clockwise mr-1"></i> Reset
+                    </button>
+                </div>
+
+                <div id="i2p-upload-section">
+                    <div id="i2p-drop-zone" class="drop-zone rounded-xl p-12 flex flex-col items-center justify-center cursor-pointer relative overflow-hidden min-h-[300px]">
+                        <input type="file" id="i2p-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/*" multiple>
+                        <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center mb-6">
+                            <i class="ph-duotone ph-images text-3xl text-emerald-500 dark:text-emerald-400"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Select Images</h3>
+                        <p class="text-slate-500 text-sm text-center">Drag and drop, Paste (Ctrl+V) or Select multiple files</p>
+                    </div>
+                </div>
+
+                <div id="i2p-preview-section" class="hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <button onclick="document.getElementById('i2p-add-more').click()" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center">
+                            <i class="ph-bold ph-plus mr-2"></i> Add Images
+                        </button>
+                        <input type="file" id="i2p-add-more" class="hidden" accept="image/*" multiple onchange="imgToPdfApp.addMoreFiles(this.files)">
+                        
+                        <button onclick="imgToPdfApp.generatePDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg shadow-emerald-500/20 flex items-center transition-all">
+                            <i class="ph-bold ph-file-pdf mr-2"></i> Convert to PDF
+                        </button>
+                    </div>
+                    
+                    <div id="i2p-list" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>
+                    <p class="text-xs text-center text-slate-400 mt-4">Drag and drop images to reorder them.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-vectorizer" class="view-section hidden fade-in">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold">Image Vectorizer</h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">Convert Raster (JPG/PNG) to Vector (SVG)</p>
+                    </div>
+                    <button onclick="vectorizerApp.reset()" class="text-sm text-slate-500 hover:text-primary flex items-center transition-colors">
+                        <i class="ph-bold ph-arrow-counter-clockwise mr-1"></i> Reset
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 gap-6">
+                    <div id="vector-drop-zone" class="drop-zone rounded-xl p-8 flex flex-col items-center justify-center min-h-[300px] cursor-pointer relative overflow-hidden">
+                        <input type="file" id="vector-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/*">
+                        
+                        <div id="vector-placeholder" class="text-center pointer-events-none">
+                            <div class="w-16 h-16 bg-amber-100 dark:bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="ph-duotone ph-bezier-curve text-3xl text-amber-600 dark:text-amber-400"></i>
+                            </div>
+                            <h3 class="text-lg font-medium">Drop image to Vectorize</h3>
+                            <p class="text-slate-500 text-sm mt-1">Paste (Ctrl+V) or Drop JPG/PNG</p>
+                        </div>
+
+                        <div id="vector-loader" class="hidden flex flex-col items-center">
+                            <div class="loader mb-4 border-t-amber-500 border-amber-200 dark:border-amber-900 dark:border-t-amber-500"></div>
+                            <p class="text-sm text-slate-500">Tracing contours...</p>
+                        </div>
+
+                        <div id="vector-preview-container" class="hidden w-full bg-checkered p-4 rounded bg-white/50 h-[400px] flex items-center justify-center overflow-auto">
+                            <div id="vector-result" class="max-w-full max-h-full"></div>
+                        </div>
+                    </div>
+
+                    <div id="vector-controls" class="hidden glass-panel p-6 rounded-xl flex justify-between items-center">
+                        <div class="text-sm text-slate-500">
+                            <span class="font-medium text-slate-900 dark:text-white">Success!</span> Download your vector file below.
+                        </div>
+                        <button id="vector-download-btn" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-6 rounded-lg transition-all flex items-center justify-center shadow-lg shadow-amber-500/20">
+                            <i class="ph-bold ph-download-simple mr-2"></i> Download SVG
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-ocr" class="view-section hidden fade-in">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold">Text Extractor</h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">Extract text from images (OCR)</p>
+                    </div>
+                    <button onclick="ocrApp.reset()" class="text-sm text-slate-500 hover:text-primary flex items-center transition-colors">
+                        <i class="ph-bold ph-arrow-counter-clockwise mr-1"></i> Reset
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div id="ocr-drop-zone" class="drop-zone rounded-xl p-8 flex flex-col items-center justify-center min-h-[400px] cursor-pointer relative overflow-hidden">
+                        <input type="file" id="ocr-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/*">
+                        
+                        <div id="ocr-placeholder" class="text-center pointer-events-none">
+                            <div class="w-16 h-16 bg-blue-100 dark:bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="ph-duotone ph-text-t text-3xl text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <h3 class="text-lg font-medium">Drop image here</h3>
+                            <p class="text-slate-500 text-sm mt-1">Paste (Ctrl+V) or Drop</p>
+                        </div>
+
+                        <div id="ocr-preview-container" class="hidden w-full h-full flex items-center justify-center">
+                            <img id="ocr-preview" class="max-w-full max-h-[350px] object-contain rounded shadow-lg" src="" alt="Preview">
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col h-full">
+                        <div class="glass-panel p-4 rounded-t-xl border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                            <h3 class="font-semibold">Extracted Text</h3>
+                            <button onclick="ocrApp.copyText()" class="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 font-medium">
+                                <i class="ph-bold ph-copy mr-1"></i> Copy
+                            </button>
+                        </div>
+                        <div class="flex-grow glass-panel rounded-b-xl p-0 relative min-h-[345px]">
+                            <textarea id="ocr-result" class="w-full h-full bg-transparent p-4 resize-none focus:outline-none font-mono text-sm" placeholder="Text will appear here..." readonly></textarea>
+                            
+                            <div id="ocr-loader" class="absolute inset-0 bg-white/80 dark:bg-slate-900/80 flex flex-col items-center justify-center hidden backdrop-blur-sm rounded-b-xl">
+                                <div class="loader mb-4 border-t-blue-500 border-blue-200 dark:border-blue-900 dark:border-t-blue-500"></div>
+                                <p class="text-sm font-medium text-slate-700 dark:text-slate-300">Recognizing text...</p>
+                                <p id="ocr-progress" class="text-xs text-slate-500 mt-1">0%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="border-t border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 py-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-slate-500 text-sm">© 2024 Avara.</p>
+        </div>
+    </footer>
+
+    <script>
+        const router = {
+            currentView: 'view-home',
+            navigate(viewId) {
+                const targetId = viewId.startsWith('view-') ? viewId : `view-${viewId}`;
+                document.getElementById(this.currentView).classList.add('hidden');
+                const target = document.getElementById(targetId);
+                if(target) {
+                    target.classList.remove('hidden');
+                    this.currentView = targetId;
+                    window.scrollTo(0,0);
+                }
+            }
+        };
+
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+
+        function formatBytes(bytes, decimals = 2) {
+            if (!+bytes) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+        }
+
+        function setupDragAndDrop(dropZoneId, inputId, handleFiles) {
+            const dropZone = document.getElementById(dropZoneId);
+            const input = document.getElementById(inputId);
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files);
+            }, false);
+
+            input.addEventListener('change', function() {
+                handleFiles(this.files);
+            });
+        }
+
+        const resizerApp = {
+            file: null,
+            img: null,
+            originalWidth: 0,
+            originalHeight: 0,
+
+            init() {
+                setupDragAndDrop('resizer-drop-zone', 'resizer-input', this.handleFile.bind(this));
+                document.getElementById('resizer-width').addEventListener('input', (e) => this.handleDimensionChange('w', e.target.value));
+                document.getElementById('resizer-height').addEventListener('input', (e) => this.handleDimensionChange('h', e.target.value));
+                document.getElementById('resizer-quality').addEventListener('input', (e) => {
+                    document.getElementById('quality-value').innerText = e.target.value;
+                });
+                document.getElementById('resizer-download-btn').addEventListener('click', this.download.bind(this));
+                
+                document.addEventListener('paste', (e) => {
+                    if(!document.getElementById('view-resizer').classList.contains('hidden')) {
+                        this.handlePaste(e);
+                    }
+                });
+            },
+
+            async handlePaste(e) {
+                const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+                for (const item of items) {
+                    if (item.kind === 'file' && item.type.match('image.*')) {
+                        const blob = item.getAsFile();
+                        this.handleFile([blob]);
+                        return;
+                    } else if (item.kind === 'string' && item.type === 'text/plain') {
+                        item.getAsString(async (url) => {
+                            if(url.match(/\.(jpeg|jpg|gif|png|webp)$/i) || url.startsWith('http')) {
+                                try {
+                                    const response = await fetch(url);
+                                    const blob = await response.blob();
+                                    if(blob.type.match('image.*')) {
+                                        const name = url.split('/').pop() || 'pasted-image.png';
+                                        const file = new File([blob], name, {type: blob.type});
+                                        this.handleFile([file]);
+                                    }
+                                } catch(err) {
+                                    alert("Could not load image from URL (CORS restricted).");
+                                }
+                            }
+                        });
+                    }
+                }
+            },
+
+            handleFile(files) {
+                if (files.length === 0) return;
+                const file = files[0];
+                if (!file.type.match('image.*')) {
+                    alert("Please upload an image file.");
+                    return;
+                }
+
+                this.file = file;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.img = new Image();
+                    this.img.onload = () => {
+                        this.originalWidth = this.img.width;
+                        this.originalHeight = this.img.height;
+                        this.enableControls();
+                        this.updatePreview(e.target.result);
+                        this.updateInfo();
+                    };
+                    this.img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            },
+
+            enableControls() {
+                const controls = document.getElementById('resizer-controls');
+                controls.classList.remove('opacity-50', 'pointer-events-none');
+                document.getElementById('resizer-width').value = this.originalWidth;
+                document.getElementById('resizer-height').value = this.originalHeight;
+            },
+
+            updatePreview(src) {
+                const preview = document.getElementById('resizer-preview');
+                const container = document.getElementById('resizer-preview-container');
+                const placeholder = document.getElementById('resizer-placeholder');
+                
+                preview.src = src;
+                container.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            },
+
+            updateInfo() {
+                document.getElementById('resizer-info').classList.remove('hidden');
+                document.getElementById('resizer-original-dims').innerText = `${this.originalWidth} x ${this.originalHeight}`;
+                document.getElementById('resizer-original-size').innerText = formatBytes(this.file.size);
+            },
+
+            handleDimensionChange(type, value) {
+                const ratioLocked = document.getElementById('resizer-ratio').checked;
+                if (!ratioLocked || !this.img) return;
+
+                const aspectRatio = this.originalWidth / this.originalHeight;
+                
+                if (type === 'w') {
+                    const newH = Math.round(value / aspectRatio);
+                    document.getElementById('resizer-height').value = newH;
+                } else {
+                    const newW = Math.round(value * aspectRatio);
+                    document.getElementById('resizer-width').value = newW;
+                }
+            },
+
+            download() {
+                if (!this.img) return;
+
+                const width = parseInt(document.getElementById('resizer-width').value);
+                const height = parseInt(document.getElementById('resizer-height').value);
+                const quality = parseInt(document.getElementById('resizer-quality').value) / 100;
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                
+                ctx.drawImage(this.img, 0, 0, width, height);
+
+                let type = this.file.type;
+                if(type === 'image/svg+xml') type = 'image/png';
+
+                const dataUrl = canvas.toDataURL(type, quality);
+                
+                const link = document.createElement('a');
+                link.download = `avara-resized-${this.file.name}`;
+                link.href = dataUrl;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            },
+
+            reset() {
+                this.file = null;
+                this.img = null;
+                document.getElementById('resizer-input').value = '';
+                document.getElementById('resizer-placeholder').classList.remove('hidden');
+                document.getElementById('resizer-preview-container').classList.add('hidden');
+                document.getElementById('resizer-info').classList.add('hidden');
+                document.getElementById('resizer-controls').classList.add('opacity-50', 'pointer-events-none');
+                document.getElementById('resizer-width').value = '';
+                document.getElementById('resizer-height').value = '';
+            }
+        };
+
+        const pdfApp = {
+            pdfDoc: null,
+            convertedImages: [],
+            
+            init() {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                setupDragAndDrop('pdf-drop-zone', 'pdf-input', this.handleFile.bind(this));
+                document.getElementById('pdf-download-all').addEventListener('click', this.downloadAll.bind(this));
+                
+                document.addEventListener('paste', (e) => {
+                    if(!document.getElementById('view-pdf').classList.contains('hidden')) {
+                        this.handlePaste(e);
+                    }
+                });
+            },
+
+            async handlePaste(e) {
+                const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+                for (const item of items) {
+                    if (item.kind === 'file' && item.type === 'application/pdf') {
+                        const blob = item.getAsFile();
+                        this.handleFile([blob]);
+                        return;
+                    }
+                }
+            },
+
+            async handleFile(files) {
+                if (files.length === 0) return;
+                const file = files[0];
+                if (file.type !== 'application/pdf') {
+                    alert("Please upload a PDF file.");
+                    return;
+                }
+
+                document.getElementById('pdf-upload-section').classList.add('hidden');
+                document.getElementById('pdf-results-section').classList.remove('hidden');
+                document.getElementById('pdf-filename').innerText = file.name;
+                document.getElementById('pdf-progress-container').classList.remove('hidden');
+                document.getElementById('pdf-gallery').innerHTML = '';
+
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    this.pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    document.getElementById('pdf-page-count').innerText = `${this.pdfDoc.numPages} pages`;
+                    await this.convertPages();
+                } catch (error) {
+                    console.error(error);
+                    alert("Error parsing PDF.");
+                    this.reset();
+                }
+            },
+
+            async convertPages() {
+                this.convertedImages = [];
+                const gallery = document.getElementById('pdf-gallery');
+                const progressBar = document.getElementById('pdf-progress-bar');
+                const progressText = document.getElementById('pdf-progress-text');
+                const downloadAllBtn = document.getElementById('pdf-download-all');
+
+                downloadAllBtn.disabled = true;
+
+                for (let i = 1; i <= this.pdfDoc.numPages; i++) {
+                    const percentage = Math.round((i / this.pdfDoc.numPages) * 100);
+                    progressBar.style.width = `${percentage}%`;
+                    progressText.innerText = `${percentage}%`;
+
+                    const page = await this.pdfDoc.getPage(i);
+                    const viewport = page.getViewport({ scale: 1.5 });
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+                    const imgData = canvas.toDataURL('image/jpeg', 0.85);
+                    this.convertedImages.push({ page: i, data: imgData });
+
+                    const card = document.createElement('div');
+                    card.className = 'glass-panel p-2 rounded-lg flex flex-col fade-in';
+                    card.innerHTML = `
+                        <div class="relative group bg-slate-100 dark:bg-slate-900 rounded overflow-hidden aspect-[3/4] mb-2 border border-slate-200 dark:border-slate-700">
+                            <img src="${imgData}" class="w-full h-full object-contain">
+                            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <a href="${imgData}" download="page-${i}.jpg" class="bg-white text-slate-900 rounded-full p-2 hover:bg-primary hover:text-white transition-colors">
+                                    <i class="ph-bold ph-download-simple text-lg"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center px-1">
+                            <span class="text-xs font-mono text-slate-500">Page ${i}</span>
+                        </div>
+                    `;
+                    gallery.appendChild(card);
+                }
+
+                setTimeout(() => {
+                    document.getElementById('pdf-progress-container').classList.add('hidden');
+                    downloadAllBtn.disabled = false;
+                }, 500);
+            },
+
+            downloadAll() {
+                if (this.convertedImages.length === 0) return;
+                const zip = new JSZip();
+                const folder = zip.folder("avara-pdf-images");
+                this.convertedImages.forEach(item => {
+                    const data = item.data.split(',')[1];
+                    folder.file(`page-${item.page}.jpg`, data, {base64: true});
+                });
+
+                zip.generateAsync({type:"blob"}).then(function(content) {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(content);
+                    link.download = "avara-converted-images.zip";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
+            },
+
+            reset() {
+                this.pdfDoc = null;
+                this.convertedImages = [];
+                document.getElementById('pdf-upload-section').classList.remove('hidden');
+                document.getElementById('pdf-results-section').classList.add('hidden');
+                document.getElementById('pdf-input').value = '';
+                document.getElementById('pdf-gallery').innerHTML = '';
+            }
+        };
+
+        const imgToPdfApp = {
+            files: [],
+            
+            init() {
+                setupDragAndDrop('i2p-drop-zone', 'i2p-input', this.handleFiles.bind(this));
+                document.addEventListener('paste', (e) => {
+                    if(!document.getElementById('view-img2pdf').classList.contains('hidden')) {
+                        this.handlePaste(e);
+                    }
+                });
+            },
+
+            async handlePaste(e) {
+                const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+                const newFiles = [];
+                
+                for (const item of items) {
+                    if (item.kind === 'file' && item.type.match('image.*')) {
+                        newFiles.push(item.getAsFile());
+                    } else if (item.kind === 'string' && item.type === 'text/plain') {
+                        item.getAsString(async (url) => {
+                            if(url.match(/\.(jpeg|jpg|gif|png|webp)$/i) || url.startsWith('http')) {
+                                try {
+                                    const response = await fetch(url);
+                                    const blob = await response.blob();
+                                    if(blob.type.match('image.*')) {
+                                        const name = url.split('/').pop() || `pasted-image-${Date.now()}.png`;
+                                        const file = new File([blob], name, {type: blob.type});
+                                        if (this.files.length > 0) {
+                                            this.addMoreFiles([file]);
+                                        } else {
+                                            this.handleFiles([file]);
+                                        }
+                                    }
+                                } catch(err) {}
+                            }
+                        });
+                    }
+                }
+                
+                if (newFiles.length > 0) {
+                    if (this.files.length > 0) {
+                        this.addMoreFiles(newFiles);
+                    } else {
+                        this.handleFiles(newFiles);
+                    }
+                }
+            },
+
+            handleFiles(fileList) {
+                if (fileList.length === 0) return;
+                
+                const newFiles = Array.from(fileList).filter(f => f.type.match('image.*'));
+                if(newFiles.length === 0) {
+                    alert("Please select image files.");
+                    return;
+                }
+                
+                this.files = newFiles;
+
+                document.getElementById('i2p-upload-section').classList.add('hidden');
+                document.getElementById('i2p-preview-section').classList.remove('hidden');
+                this.renderPreview();
+            },
+
+            addMoreFiles(fileList) {
+                if (fileList.length === 0) return;
+                const newFiles = Array.from(fileList).filter(f => f.type.match('image.*'));
+                if (newFiles.length === 0) return;
+                
+                this.files = [...this.files, ...newFiles];
+                this.renderPreview();
+                document.getElementById('i2p-add-more').value = ''; 
+            },
+
+            renderPreview() {
+                const list = document.getElementById('i2p-list');
+                list.innerHTML = '';
+                
+                this.files.forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const div = document.createElement('div');
+                        div.className = 'glass-panel p-2 rounded-lg relative group fade-in draggable-item';
+                        div.draggable = true;
+                        div.dataset.index = index;
+                        div.innerHTML = `
+                            <div class="aspect-square bg-slate-100 dark:bg-slate-900 rounded overflow-hidden mb-2 pointer-events-none">
+                                <img src="${e.target.result}" class="w-full h-full object-cover">
+                            </div>
+                            <p class="text-xs truncate text-slate-500 pointer-events-none">${file.name}</p>
+                            <button onclick="imgToPdfApp.removeFile(${index})" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="ph-bold ph-x text-sm"></i>
+                            </button>
+                        `;
+
+                        div.addEventListener('dragstart', this.handleDragStart.bind(this));
+                        div.addEventListener('dragover', this.handleDragOver.bind(this));
+                        div.addEventListener('drop', this.handleDrop.bind(this));
+                        div.addEventListener('dragenter', this.handleDragEnter.bind(this));
+                        div.addEventListener('dragleave', this.handleDragLeave.bind(this));
+
+                        list.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            },
+
+            handleDragStart(e) {
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', e.target.dataset.index);
+                e.target.classList.add('dragging');
+            },
+
+            handleDragOver(e) {
+                if (e.preventDefault) {
+                    e.preventDefault();
+                }
+                e.dataTransfer.dropEffect = 'move';
+                return false;
+            },
+
+            handleDragEnter(e) {
+                e.target.closest('.draggable-item')?.classList.add('border-indigo-500');
+            },
+
+            handleDragLeave(e) {
+                e.target.closest('.draggable-item')?.classList.remove('border-indigo-500');
+            },
+
+            handleDrop(e) {
+                if (e.stopPropagation) {
+                    e.stopPropagation();
+                }
+                
+                const dragIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                const dropTarget = e.target.closest('.draggable-item');
+                
+                if (dropTarget) {
+                    const dropIndex = parseInt(dropTarget.dataset.index);
+                    if (dragIndex !== dropIndex) {
+                        this.moveItem(dragIndex, dropIndex);
+                    }
+                    dropTarget.classList.remove('border-indigo-500');
+                }
+                
+                document.querySelectorAll('.draggable-item').forEach(item => item.classList.remove('dragging'));
+                return false;
+            },
+
+            moveItem(fromIndex, toIndex) {
+                const itemToMove = this.files[fromIndex];
+                this.files.splice(fromIndex, 1);
+                this.files.splice(toIndex, 0, itemToMove);
+                this.renderPreview();
+            },
+
+            removeFile(index) {
+                this.files.splice(index, 1);
+                if(this.files.length === 0) {
+                    this.reset();
+                } else {
+                    this.renderPreview();
+                }
+            },
+
+            async generatePDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                for(let i=0; i<this.files.length; i++) {
+                    if(i > 0) doc.addPage();
+                    
+                    const file = this.files[i];
+                    const dataUrl = await this.readFile(file);
+                    const imgProps = doc.getImageProperties(dataUrl);
+                    
+                    const pdfWidth = doc.internal.pageSize.getWidth();
+                    const pdfHeight = doc.internal.pageSize.getHeight();
+                    
+                    const widthRatio = pdfWidth / imgProps.width;
+                    const heightRatio = pdfHeight / imgProps.height;
+                    const ratio = Math.min(widthRatio, heightRatio);
+                    
+                    const w = imgProps.width * ratio;
+                    const h = imgProps.height * ratio;
+                    
+                    const x = (pdfWidth - w) / 2;
+                    const y = (pdfHeight - h) / 2;
+
+                    doc.addImage(dataUrl, 'JPEG', x, y, w, h);
+                }
+                
+                doc.save('avara-converted.pdf');
+            },
+
+            readFile(file) {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(file);
+                });
+            },
+
+            reset() {
+                this.files = [];
+                document.getElementById('i2p-input').value = '';
+                document.getElementById('i2p-upload-section').classList.remove('hidden');
+                document.getElementById('i2p-preview-section').classList.add('hidden');
+                document.getElementById('i2p-list').innerHTML = '';
+            }
+        };
+
+        const vectorizerApp = {
+            file: null,
+            svgString: '',
+            
+            init() {
+                setupDragAndDrop('vector-drop-zone', 'vector-input', this.handleFile.bind(this));
+                document.getElementById('vector-download-btn').addEventListener('click', this.download.bind(this));
+                
+                if (typeof ImageTracer === 'undefined') {
+                    const script = document.createElement('script');
+                    script.src = 'https://unpkg.com/imagetracerjs@1.2.6/imagetracer_v1.2.6.js';
+                    document.head.appendChild(script);
+                }
+                
+                document.addEventListener('paste', (e) => {
+                    if(!document.getElementById('view-vectorizer').classList.contains('hidden')) {
+                        this.handlePaste(e);
+                    }
+                });
+            },
+
+            async handlePaste(e) {
+                const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+                for (const item of items) {
+                    if (item.kind === 'file' && item.type.match('image.*')) {
+                        const blob = item.getAsFile();
+                        this.handleFile([blob]);
+                        return;
+                    } else if (item.kind === 'string' && item.type === 'text/plain') {
+                        item.getAsString(async (url) => {
+                            if(url.match(/\.(jpeg|jpg|gif|png|webp)$/i) || url.startsWith('http')) {
+                                try {
+                                    const response = await fetch(url);
+                                    const blob = await response.blob();
+                                    if(blob.type.match('image.*')) {
+                                        const name = url.split('/').pop() || 'pasted-image.png';
+                                        const file = new File([blob], name, {type: blob.type});
+                                        this.handleFile([file]);
+                                    }
+                                } catch(err) {
+                                    alert("Could not load image from URL (CORS restricted).");
+                                }
+                            }
+                        });
+                    }
+                }
+            },
+
+            handleFile(files) {
+                if (files.length === 0) return;
+                const file = files[0];
+                if (!file.type.match('image.*')) {
+                    alert("Please upload an image file.");
+                    return;
+                }
+                
+                this.file = file;
+                
+                document.getElementById('vector-placeholder').classList.add('hidden');
+                document.getElementById('vector-loader').classList.remove('hidden');
+                document.getElementById('vector-result').innerHTML = '';
+                document.getElementById('vector-controls').classList.add('hidden');
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        setTimeout(() => {
+                            try {
+                                if (typeof ImageTracer === 'undefined') {
+                                    throw new Error("ImageTracer library not loaded. Please check your internet connection.");
+                                }
+
+                                const MAX_WIDTH = 800;
+                                let width = img.width;
+                                let height = img.height;
+                                
+                                if (width > MAX_WIDTH) {
+                                    height = Math.round(height * (MAX_WIDTH / width));
+                                    width = MAX_WIDTH;
+                                }
+
+                                const canvas = document.createElement('canvas');
+                                canvas.width = width;
+                                canvas.height = height;
+                                const ctx = canvas.getContext('2d');
+                                ctx.drawImage(img, 0, 0, width, height);
+                                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                                
+                                const options = {
+                                    ltres: 1, 
+                                    qtres: 1, 
+                                    scale: 1, 
+                                    strokewidth: 0,
+                                    numberofcolors: 16
+                                };
+                                
+                                this.svgString = ImageTracer.imagedataToSVG(imgData, options);
+                                this.showResult();
+                            } catch (err) {
+                                console.error(err);
+                                alert("Vectorization failed: " + err.message);
+                                this.reset();
+                            }
+                        }, 50);
+                    };
+                };
+                reader.readAsDataURL(file);
+            },
+
+            showResult() {
+                document.getElementById('vector-loader').classList.add('hidden');
+                document.getElementById('vector-preview-container').classList.remove('hidden');
+                document.getElementById('vector-result').innerHTML = this.svgString;
+                
+                const svgElement = document.getElementById('vector-result').querySelector('svg');
+                if(svgElement) {
+                    svgElement.style.width = '100%';
+                    svgElement.style.height = '100%';
+                }
+                
+                document.getElementById('vector-controls').classList.remove('hidden');
+                document.getElementById('vector-controls').classList.add('flex');
+            },
+
+            download() {
+                if (!this.svgString) return;
+                
+                const blob = new Blob([this.svgString], {type: "image/svg+xml"});
+                const url = URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.download = `avara-vector-${this.file.name.split('.')[0]}.svg`;
+                link.href = url;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            },
+
+            reset() {
+                this.file = null;
+                this.svgString = '';
+                document.getElementById('vector-input').value = '';
+                document.getElementById('vector-placeholder').classList.remove('hidden');
+                document.getElementById('vector-loader').classList.add('hidden');
+                document.getElementById('vector-preview-container').classList.add('hidden');
+                document.getElementById('vector-controls').classList.add('hidden');
+                document.getElementById('vector-controls').classList.remove('flex');
+            }
+        };
+
+        const ocrApp = {
+            init() {
+                setupDragAndDrop('ocr-drop-zone', 'ocr-input', this.handleFile.bind(this));
+                document.addEventListener('paste', (e) => {
+                    if(!document.getElementById('view-ocr').classList.contains('hidden')) {
+                        this.handlePaste(e);
+                    }
+                });
+            },
+
+            async handlePaste(e) {
+                const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+                for (const item of items) {
+                    if (item.kind === 'file' && item.type.match('image.*')) {
+                        const blob = item.getAsFile();
+                        this.handleFile([blob]);
+                        return;
+                    } else if (item.kind === 'string' && item.type === 'text/plain') {
+                        item.getAsString(async (url) => {
+                            if(url.match(/\.(jpeg|jpg|gif|png|webp)$/i) || url.startsWith('http')) {
+                                try {
+                                    const response = await fetch(url);
+                                    const blob = await response.blob();
+                                    if(blob.type.match('image.*')) {
+                                        const name = url.split('/').pop() || 'pasted-image.png';
+                                        const file = new File([blob], name, {type: blob.type});
+                                        this.handleFile([file]);
+                                    }
+                                } catch(err) {
+                                    alert("Could not load image from URL (CORS restricted).");
+                                }
+                            }
+                        });
+                    }
+                }
+            },
+
+            handleFile(files) {
+                if (files.length === 0) return;
+                const file = files[0];
+                if (!file.type.match('image.*')) {
+                    alert("Please upload an image file.");
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.getElementById('ocr-preview');
+                    img.src = e.target.result;
+                    document.getElementById('ocr-placeholder').classList.add('hidden');
+                    document.getElementById('ocr-preview-container').classList.remove('hidden');
+                    
+                    this.recognize(file);
+                };
+                reader.readAsDataURL(file);
+            },
+
+            recognize(file) {
+                const loader = document.getElementById('ocr-loader');
+                const progress = document.getElementById('ocr-progress');
+                const result = document.getElementById('ocr-result');
+                
+                loader.classList.remove('hidden');
+                result.value = '';
+
+                Tesseract.recognize(
+                    file,
+                    'eng',
+                    {
+                        logger: m => {
+                            if (m.status === 'recognizing text') {
+                                progress.innerText = `${Math.round(m.progress * 100)}%`;
+                            }
+                        }
+                    }
+                ).then(({ data: { text } }) => {
+                    result.value = text;
+                    loader.classList.add('hidden');
+                }).catch(err => {
+                    console.error(err);
+                    alert("OCR Failed: " + err.message);
+                    loader.classList.add('hidden');
+                });
+            },
+
+            copyText() {
+                const text = document.getElementById('ocr-result');
+                text.select();
+                document.execCommand('copy');
+                
+                const btn = document.querySelector('button[onclick="ocrApp.copyText()"]');
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="ph-bold ph-check mr-1"></i> Copied!';
+                setTimeout(() => btn.innerHTML = original, 2000);
+            },
+
+            reset() {
+                document.getElementById('ocr-input').value = '';
+                document.getElementById('ocr-placeholder').classList.remove('hidden');
+                document.getElementById('ocr-preview-container').classList.add('hidden');
+                document.getElementById('ocr-result').value = '';
+                document.getElementById('ocr-loader').classList.add('hidden');
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            resizerApp.init();
+            pdfApp.init();
+            imgToPdfApp.init();
+            vectorizerApp.init();
+            ocrApp.init();
+        });
+    </script>
+</body>
+</html>
