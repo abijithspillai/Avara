@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avara | Multi-Tool Suite</title>
+    <link rel="icon" type="image/png" href="avara.png">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+
+    <!-- External Libraries -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/imagetracerjs@1.2.6/imagetracer_v1.2.6.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    
+    <!-- New Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.4.0/color-thief.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
+    <script src="https://unpkg.com/@imgly/background-removal@1.4.3/dist/browser/bgremover.js"></script>
+    <script src="https://unpkg.com/pica@9.0.1/dist/pica.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/dist/face-api.min.js"></script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" onclick="router.navigate('home')">
+                <img src="avara.png" alt="Avara Logo">
+                <span>Avara</span>
+            </a>
+            
+            <div class="nav-links" style="padding-bottom: 0;">
+                <button onclick="router.navigate('home')" class="nav-link">Home</button>
+                <button onclick="router.navigate('resizer')" class="nav-link">Resizer</button>
+                <button onclick="router.navigate('pdf')" class="nav-link">PDF to Img</button>
+                <button onclick="router.navigate('img2pdf')" class="nav-link">Img to PDF</button>
+                <button onclick="router.navigate('vectorizer')" class="nav-link">Vectorize</button>
+                <button onclick="router.navigate('ocr')" class="nav-link">OCR</button>
+            </div>
+            
+            <button id="theme-toggle" class="theme-btn" aria-label="Toggle Dark Mode">
+                <i class="ph-bold ph-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container relative">
+        
+        <!-- Home View -->
+        <div id="view-home" class="view-section">
+            <div class="text-center" style="padding: 4rem 0;">
+                <h1 class="hero-title">Master Your Media</h1>
+                <p class="hero-subtitle">Powerful, secure client-side tools with a premium design.</p>
+                
+                <div class="grid gap-6 lg:grid-cols-4 md:grid-cols-3 grid-cols-1">
+                    <div onclick="router.navigate('resizer')" class="glass-panel tool-card">
+                        <div class="tool-icon color-indigo"><i class="ph-bold ph-arrows-out-simple"></i></div>
+                        <h3>Image Resizer</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Resize JPG, PNG, and WebP instantly with precision.</p>
+                    </div>
+
+                    <div onclick="router.navigate('pdf')" class="glass-panel tool-card">
+                        <div class="tool-icon color-pink"><i class="ph-bold ph-file-pdf"></i></div>
+                        <h3>PDF to Image</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Convert PDF pages into high-quality images.</p>
+                    </div>
+
+                    <div onclick="router.navigate('img2pdf')" class="glass-panel tool-card">
+                        <div class="tool-icon color-emerald"><i class="ph-bold ph-images"></i></div>
+                        <h3>Images to PDF</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Combine multiple images into a single PDF document.</p>
+                    </div>
+
+                    <div onclick="router.navigate('vectorizer')" class="glass-panel tool-card">
+                        <div class="tool-icon color-amber"><i class="ph-bold ph-bezier-curve"></i></div>
+                        <h3>Vectorizer</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Convert raster images to SVG vectors.</p>
+                    </div>
+
+                    <div onclick="router.navigate('ocr')" class="glass-panel tool-card">
+                        <div class="tool-icon color-blue"><i class="ph-bold ph-text-t"></i></div>
+                        <h3>Text Extractor</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Extract text content from images using precise OCR.</p>
+                    </div>
+
+                    <!-- New Tools -->
+                    <div onclick="router.navigate('bgremover')" class="glass-panel tool-card">
+                        <div class="tool-icon" style="background: rgba(168, 85, 247, 0.1); color: #a855f7;"><i class="ph-bold ph-scissors"></i></div>
+                        <h3>Background Remover</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Remove backgrounds instantly using AI.</p>
+                    </div>
+
+                    <div onclick="router.navigate('upscaler')" class="glass-panel tool-card">
+                        <div class="tool-icon" style="background: rgba(6, 182, 212, 0.1); color: #06b6d4;"><i class="ph-bold ph-magnifying-glass-plus"></i></div>
+                        <h3>Image Upscaler</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Enhance and enlarge images using high-quality filtering.</p>
+                    </div>
+
+                    <div onclick="router.navigate('denoiser')" class="glass-panel tool-card">
+                        <div class="tool-icon" style="background: rgba(20, 184, 166, 0.1); color: #14b8a6;"><i class="ph-bold ph-drop"></i></div>
+                        <h3>Image Denoiser</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Smooth out grain and noise from photos.</p>
+                    </div>
+
+                    <div onclick="router.navigate('colorize')" class="glass-panel tool-card">
+                        <div class="tool-icon" style="background: rgba(217, 70, 239, 0.1); color: #d946ef;"><i class="ph-bold ph-palette"></i></div>
+                        <h3>Colorize B&W</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Add beautiful color tints to black and white photos.</p>
+                    </div>
+
+                    <div onclick="router.navigate('faceblur')" class="glass-panel tool-card">
+                        <div class="tool-icon" style="background: rgba(244, 63, 94, 0.1); color: #f43f5e;"><i class="ph-bold ph-user-focus"></i></div>
+                        <h3>Face Blur</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Automatically detect and blur faces for privacy.</p>
+                    </div>
+
+                    <div onclick="router.navigate('cropper')" class="glass-panel tool-card">
+                        <div class="tool-icon" style="background: rgba(249, 115, 22, 0.1); color: #f97316;"><i class="ph-bold ph-crop"></i></div>
+                        <h3>Image Crop</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Crop by precise aspect ratios (16:9, 1:1).</p>
+                    </div>
+
+                    <div onclick="router.navigate('palette')" class="glass-panel tool-card">
+                        <div class="tool-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;"><i class="ph-bold ph-eyedropper"></i></div>
+                        <h3>Palette Extractor</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Extract beautiful color palettes from any image.</p>
+                    </div>
+
+                    <div onclick="router.navigate('compressor')" class="glass-panel tool-card">
+                        <div class="tool-icon" style="background: rgba(132, 204, 22, 0.1); color: #84cc16;"><i class="ph-bold ph-file-archive"></i></div>
+                        <h3>Image Compressor</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Reduce file size without losing quality.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5 ORIGINAL VIEWS -->
+        
+        <div id="view-resizer" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div>
+                    <h2 class="view-title">Image Resizer</h2>
+                    <p class="view-subtitle">Adjust dimensions maintaining quality</p>
+                </div>
+                <button onclick="resizerApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            <div class="layout-split">
+                <div>
+                    <div id="resizer-drop-zone" class="drop-zone">
+                        <input type="file" id="resizer-input" accept="image/*">
+                        <div id="resizer-placeholder">
+                            <div class="tool-icon color-indigo" style="margin: 0 auto 1rem;"><i class="ph-duotone ph-image"></i></div>
+                            <h3 style="font-size: 1.25rem;">Drop image here</h3>
+                            <p style="color: var(--text-secondary); margin-top: 0.5rem;">or Paste (Ctrl+V)</p>
+                        </div>
+                        <div id="resizer-preview-container" class="hidden w-full flex items-center justify-center">
+                            <img id="resizer-preview" class="preview-img" src="" alt="Preview">
+                        </div>
+                    </div>
+                    <div id="resizer-info" class="hidden flex justify-between" style="margin-top: 1rem; font-size: 0.9rem;">
+                        <span>Original: <span id="resizer-original-dims" style="font-family: monospace; font-weight: 600;">0 x 0</span></span>
+                        <span>Size: <span id="resizer-original-size" style="font-family: monospace; font-weight: 600;">0 KB</span></span>
+                    </div>
+                </div>
+                <div class="glass-panel">
+                    <h3 style="margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--glass-border);">Settings</h3>
+                    <div id="resizer-controls" style="opacity: 0.5; pointer-events: none; transition: opacity 0.3s;">
+                        <div class="input-group">
+                            <label class="input-label">Width (px)</label>
+                            <input type="number" id="resizer-width" class="input-field">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Height (px)</label>
+                            <input type="number" id="resizer-height" class="input-field">
+                        </div>
+                        <div class="input-group flex items-center" style="gap: 0.5rem;">
+                            <input type="checkbox" id="resizer-ratio" checked>
+                            <label for="resizer-ratio" style="font-size: 0.9rem;">Maintain aspect ratio</label>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Quality: <span id="quality-value">90</span>%</label>
+                            <input type="range" id="resizer-quality" min="1" max="100" value="90">
+                        </div>
+                        <button id="resizer-download-btn" class="btn btn-primary w-full" style="margin-top: 1rem;">
+                            <i class="ph-bold ph-download-simple"></i> Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-pdf" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div>
+                    <h2 class="view-title">PDF to Image</h2>
+                    <p class="view-subtitle">Extract pages securely</p>
+                </div>
+                <button onclick="pdfApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            <div id="pdf-upload-section">
+                <div id="pdf-drop-zone" class="drop-zone">
+                    <input type="file" id="pdf-input" accept="application/pdf">
+                    <div class="tool-icon color-pink" style="margin: 0 auto 1rem;"><i class="ph-duotone ph-file-pdf"></i></div>
+                    <h3 style="font-size: 1.25rem;">Upload PDF</h3>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem;">Drag and drop, Paste (Ctrl+V) or click to browse</p>
+                </div>
+            </div>
+            <div id="pdf-results-section" class="hidden">
+                <div class="glass-panel flex justify-between items-center" style="padding: 1rem 1.5rem; margin-bottom: 2rem;">
+                    <div class="flex items-center" style="gap: 1rem;">
+                        <i class="ph-fill ph-file-pdf" style="color: #ec4899; font-size: 2rem;"></i>
+                        <div>
+                            <h4 id="pdf-filename" style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px;">filename.pdf</h4>
+                            <p id="pdf-page-count" style="font-size: 0.8rem; color: var(--text-secondary);">0 pages</p>
+                        </div>
+                    </div>
+                    <button id="pdf-download-all" class="btn btn-primary">
+                        <i class="ph-bold ph-download-simple"></i> Download ZIP
+                    </button>
+                </div>
+                <div id="pdf-progress-container" class="hidden" style="margin-bottom: 2rem;">
+                    <div class="flex justify-between" style="font-size: 0.85rem; margin-bottom: 0.5rem;">
+                        <span>Processing pages...</span>
+                        <span id="pdf-progress-text">0%</span>
+                    </div>
+                    <div class="progress-container">
+                        <div id="pdf-progress-bar" class="progress-bar" style="background: #ec4899;"></div>
+                    </div>
+                </div>
+                <div id="pdf-gallery" class="gallery-grid"></div>
+            </div>
+        </div>
+
+        <div id="view-img2pdf" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div>
+                    <h2 class="view-title">Images to PDF</h2>
+                    <p class="view-subtitle">Combine images into a document</p>
+                </div>
+                <button onclick="imgToPdfApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            <div id="i2p-upload-section">
+                <div id="i2p-drop-zone" class="drop-zone">
+                    <input type="file" id="i2p-input" accept="image/*" multiple>
+                    <div class="tool-icon color-emerald" style="margin: 0 auto 1rem;"><i class="ph-duotone ph-images"></i></div>
+                    <h3 style="font-size: 1.25rem;">Select Images</h3>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem;">Drag and drop, Paste (Ctrl+V) or Select multiple files</p>
+                </div>
+            </div>
+            <div id="i2p-preview-section" class="hidden">
+                <div class="flex justify-between items-center" style="margin-bottom: 1.5rem;">
+                    <div>
+                        <button onclick="document.getElementById('i2p-add-more').click()" class="btn btn-secondary">
+                            <i class="ph-bold ph-plus"></i> Add Images
+                        </button>
+                        <input type="file" id="i2p-add-more" class="hidden" accept="image/*" multiple>
+                    </div>
+                    <button onclick="imgToPdfApp.generatePDF()" class="btn btn-primary" style="background: #10b981;">
+                        <i class="ph-bold ph-file-pdf"></i> Convert to PDF
+                    </button>
+                </div>
+                <div id="i2p-list" class="gallery-grid" style="grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));"></div>
+                <p class="text-center" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 1.5rem;">Drag and drop images to reorder them.</p>
+            </div>
+        </div>
+
+        <div id="view-vectorizer" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div>
+                    <h2 class="view-title">Image Vectorizer</h2>
+                    <p class="view-subtitle">Convert Raster (JPG/PNG) to Vector (SVG)</p>
+                </div>
+                <button onclick="vectorizerApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            <div id="vector-drop-zone" class="drop-zone" style="min-height: 400px;">
+                <input type="file" id="vector-input" accept="image/*">
+                <div id="vector-placeholder">
+                    <div class="tool-icon color-amber" style="margin: 0 auto 1rem;"><i class="ph-duotone ph-bezier-curve"></i></div>
+                    <h3 style="font-size: 1.25rem;">Drop image to Vectorize</h3>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem;">Paste (Ctrl+V) or Drop JPG/PNG</p>
+                </div>
+                <div id="vector-loader" class="hidden text-center">
+                    <div class="loader" style="border-top-color: #f59e0b;"></div>
+                    <p style="color: var(--text-secondary); font-weight: 500;">Tracing contours...</p>
+                </div>
+                <div id="vector-preview-container" class="hidden w-full flex items-center justify-center">
+                    <div id="vector-result" style="width: 100%; display: flex; justify-content: center;"></div>
+                </div>
+            </div>
+            <div id="vector-controls" class="hidden glass-panel flex justify-between items-center" style="margin-top: 1.5rem; padding: 1rem 1.5rem;">
+                <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                    <span style="font-weight: 600; color: var(--text-primary);">Success!</span> Download your vector file below.
+                </div>
+                <button id="vector-download-btn" class="btn btn-primary" style="background: #f59e0b;">
+                    <i class="ph-bold ph-download-simple"></i> Download SVG
+                </button>
+            </div>
+        </div>
+
+        <div id="view-ocr" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div>
+                    <h2 class="view-title">Text Extractor</h2>
+                    <p class="view-subtitle">Extract text from images (OCR)</p>
+                </div>
+                <button onclick="ocrApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            <div class="layout-split">
+                <div id="ocr-drop-zone" class="drop-zone">
+                    <input type="file" id="ocr-input" accept="image/*">
+                    <div id="ocr-placeholder">
+                        <div class="tool-icon color-blue" style="margin: 0 auto 1rem;"><i class="ph-duotone ph-text-t"></i></div>
+                        <h3 style="font-size: 1.25rem;">Drop image here</h3>
+                        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Paste (Ctrl+V) or Drop</p>
+                    </div>
+                    <div id="ocr-preview-container" class="hidden w-full flex items-center justify-center">
+                        <img id="ocr-preview" class="preview-img" src="" alt="Preview">
+                    </div>
+                </div>
+                <div class="flex" style="flex-direction: column;">
+                    <div class="glass-panel" style="padding: 0; display: flex; flex-direction: column; flex-grow: 1; overflow: hidden;">
+                        <div class="text-box-header">
+                            <span>Extracted Text</span>
+                            <button id="ocr-copy-btn" onclick="ocrApp.copyText()" class="copy-btn">
+                                <i class="ph-bold ph-copy"></i> Copy
+                            </button>
+                        </div>
+                        <div style="position: relative; flex-grow: 1; display: flex;">
+                            <textarea id="ocr-result" class="text-box" placeholder="Text will appear here..." readonly></textarea>
+                            <div id="ocr-loader" class="hidden" style="position: absolute; inset: 0; background: var(--glass-bg); backdrop-filter: blur(4px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10;">
+                                <div class="loader" style="border-top-color: #3b82f6;"></div>
+                                <p style="font-weight: 500;">Recognizing text...</p>
+                                <div class="progress-container" style="width: 150px; margin-top: 1rem;">
+                                    <div id="ocr-progress-bar" class="progress-bar" style="background: #3b82f6;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW VIEWS -->
+
+        <!-- Background Remover -->
+        <div id="view-bgremover" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div>
+                    <h2 class="view-title">Background Remover</h2>
+                    <p class="view-subtitle">Remove backgrounds instantly using AI</p>
+                </div>
+                <button onclick="bgRemoverApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            <div id="bgremover-drop-zone" class="drop-zone" style="min-height: 400px;">
+                <input type="file" id="bgremover-input" accept="image/*">
+                <div id="bgremover-placeholder">
+                    <div class="tool-icon" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; margin: 0 auto 1rem;"><i class="ph-bold ph-scissors"></i></div>
+                    <h3 style="font-size: 1.25rem;">Drop image here</h3>
+                </div>
+                <div id="bgremover-loader" class="hidden text-center w-full max-w-md mx-auto z-10 p-4 glass-panel absolute">
+                    <div class="loader" style="border-top-color: #a855f7;"></div>
+                    <p style="font-weight: 500; margin-bottom: 0.5rem;">Loading AI Model & Processing...</p>
+                    <div class="progress-container"><div id="bgremover-progress" class="progress-bar" style="background: #a855f7; width: 0%;"></div></div>
+                </div>
+                <div id="bgremover-preview-container" class="hidden w-full flex items-center justify-center bg-checkered" style="border-radius: 1rem; padding: 1rem; height: 100%;">
+                    <img id="bgremover-preview" class="preview-img" src="" alt="Result" style="max-height: 350px;">
+                </div>
+            </div>
+            <div id="bgremover-controls" class="hidden glass-panel flex justify-between items-center" style="margin-top: 1.5rem; padding: 1rem 1.5rem;">
+                <span style="font-weight: 600; color: var(--text-primary);">Background Removed Successfully!</span>
+                <button id="bgremover-download-btn" class="btn btn-primary" style="background: #a855f7;">
+                    <i class="ph-bold ph-download-simple"></i> Download PNG
+                </button>
+            </div>
+        </div>
+
+        <!-- Image Upscaler -->
+        <div id="view-upscaler" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div>
+                    <h2 class="view-title">Image Upscaler</h2>
+                    <p class="view-subtitle">High-quality enlargement (Lanczos)</p>
+                </div>
+                <button onclick="upscalerApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            <div class="layout-split">
+                <div id="upscaler-drop-zone" class="drop-zone">
+                    <input type="file" id="upscaler-input" accept="image/*">
+                    <div id="upscaler-placeholder">
+                        <div class="tool-icon" style="background: rgba(6, 182, 212, 0.1); color: #06b6d4; margin: 0 auto 1rem;"><i class="ph-bold ph-magnifying-glass-plus"></i></div>
+                        <h3 style="font-size: 1.25rem;">Drop image here</h3>
+                    </div>
+                    <div id="upscaler-preview-container" class="hidden w-full flex items-center justify-center">
+                        <img id="upscaler-preview" class="preview-img" src="" alt="Preview">
+                    </div>
+                </div>
+                <div class="glass-panel">
+                    <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">Settings</h3>
+                    <div id="upscaler-controls" style="opacity: 0.5; pointer-events: none; transition: opacity 0.3s;">
+                        <div class="input-group">
+                            <label class="input-label">Upscale Factor</label>
+                            <select id="upscaler-factor" class="input-field">
+                                <option value="2">2x</option>
+                                <option value="4">4x</option>
+                                <option value="8">8x</option>
+                            </select>
+                        </div>
+                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                            Expected size: <span id="upscaler-expected">0 x 0</span>
+                        </p>
+                        <div id="upscaler-loader" class="hidden text-center" style="margin-bottom: 1rem;">
+                            <div class="loader" style="border-top-color: #06b6d4; width: 20px; height: 20px; border-width: 2px;"></div>
+                            <span style="font-size: 0.8rem;">Upscaling...</span>
+                        </div>
+                        <button id="upscaler-btn" class="btn btn-primary w-full" style="background: #06b6d4;">
+                            <i class="ph-bold ph-sparkle"></i> Upscale & Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Denoiser -->
+        <div id="view-denoiser" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div>
+                    <h2 class="view-title">Image Denoiser</h2>
+                    <p class="view-subtitle">Smooth out grain and noise</p>
+                </div>
+                <button onclick="denoiserApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            <div class="layout-split">
+                <div id="denoiser-drop-zone" class="drop-zone">
+                    <input type="file" id="denoiser-input" accept="image/*">
+                    <div id="denoiser-placeholder">
+                        <div class="tool-icon" style="background: rgba(20, 184, 166, 0.1); color: #14b8a6; margin: 0 auto 1rem;"><i class="ph-bold ph-drop"></i></div>
+                        <h3 style="font-size: 1.25rem;">Drop image here</h3>
+                    </div>
+                    <div id="denoiser-preview-container" class="hidden w-full flex items-center justify-center">
+                        <canvas id="denoiser-canvas" class="preview-img"></canvas>
+                    </div>
+                </div>
+                <div class="glass-panel">
+                    <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">Settings</h3>
+                    <div id="denoiser-controls" style="opacity: 0.5; pointer-events: none;">
+                        <div class="input-group">
+                            <label class="input-label">Smoothing Level: <span id="denoise-val">3</span></label>
+                            <input type="range" id="denoiser-level" min="1" max="10" value="3">
+                        </div>
+                        <button id="denoiser-download-btn" class="btn btn-primary w-full" style="background: #14b8a6;">
+                            <i class="ph-bold ph-download-simple"></i> Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Colorize B&W -->
+        <div id="view-colorize" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div>
+                    <h2 class="view-title">Color Tinting</h2>
+                    <p class="view-subtitle">Apply artistic color tints to B&W photos</p>
+                </div>
+                <button onclick="colorizeApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            <div class="layout-split">
+                <div id="colorize-drop-zone" class="drop-zone">
+                    <input type="file" id="colorize-input" accept="image/*">
+                    <div id="colorize-placeholder">
+                        <div class="tool-icon" style="background: rgba(217, 70, 239, 0.1); color: #d946ef; margin: 0 auto 1rem;"><i class="ph-bold ph-palette"></i></div>
+                        <h3 style="font-size: 1.25rem;">Drop image here</h3>
+                    </div>
+                    <div id="colorize-preview-container" class="hidden w-full flex items-center justify-center">
+                        <canvas id="colorize-canvas" class="preview-img"></canvas>
+                    </div>
+                </div>
+                <div class="glass-panel">
+                    <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">Tint Settings</h3>
+                    <div id="colorize-controls" style="opacity: 0.5; pointer-events: none;">
+                        <div class="input-group">
+                            <label class="input-label">Tint Color</label>
+                            <input type="color" id="colorize-color" value="#d946ef" style="width: 100%; height: 40px; border-radius: 8px; border: none; cursor: pointer;">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Intensity: <span id="colorize-val">50</span>%</label>
+                            <input type="range" id="colorize-intensity" min="0" max="100" value="50">
+                        </div>
+                        <button id="colorize-download-btn" class="btn btn-primary w-full" style="background: #d946ef;">
+                            <i class="ph-bold ph-download-simple"></i> Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Face Blur -->
+        <div id="view-faceblur" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div>
+                    <h2 class="view-title">Face Blur</h2>
+                    <p class="view-subtitle">Automatically detect and blur faces</p>
+                </div>
+                <button onclick="faceBlurApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            <div id="faceblur-drop-zone" class="drop-zone" style="min-height: 400px;">
+                <input type="file" id="faceblur-input" accept="image/*">
+                <div id="faceblur-placeholder">
+                    <div class="tool-icon" style="background: rgba(244, 63, 94, 0.1); color: #f43f5e; margin: 0 auto 1rem;"><i class="ph-bold ph-user-focus"></i></div>
+                    <h3 style="font-size: 1.25rem;">Drop image here</h3>
+                </div>
+                <div id="faceblur-loader" class="hidden text-center absolute glass-panel p-4 z-10">
+                    <div class="loader" style="border-top-color: #f43f5e;"></div>
+                    <p style="font-weight: 500;">Loading Face Models...</p>
+                </div>
+                <div id="faceblur-preview-container" class="hidden w-full flex items-center justify-center relative">
+                    <canvas id="faceblur-canvas" class="preview-img"></canvas>
+                </div>
+            </div>
+            <div id="faceblur-controls" class="hidden glass-panel flex justify-between items-center" style="margin-top: 1.5rem; padding: 1rem 1.5rem;">
+                <span id="faceblur-status" style="font-weight: 600; color: var(--text-primary);">Faces blurred successfully!</span>
+                <button id="faceblur-download-btn" class="btn btn-primary" style="background: #f43f5e;">
+                    <i class="ph-bold ph-download-simple"></i> Download Image
+                </button>
+            </div>
+        </div>
+
+        <!-- Image Crop -->
+        <div id="view-cropper" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div>
+                    <h2 class="view-title">Image Cropper</h2>
+                    <p class="view-subtitle">Crop with precise aspect ratios</p>
+                </div>
+                <button onclick="cropperApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            <div class="layout-split">
+                <div id="cropper-drop-zone" class="drop-zone" style="padding: 0; min-height: 400px; overflow: hidden;">
+                    <input type="file" id="cropper-input" accept="image/*">
+                    <div id="cropper-placeholder" style="padding: 3rem;">
+                        <div class="tool-icon" style="background: rgba(249, 115, 22, 0.1); color: #f97316; margin: 0 auto 1rem;"><i class="ph-bold ph-crop"></i></div>
+                        <h3 style="font-size: 1.25rem;">Drop image here</h3>
+                    </div>
+                    <div id="cropper-preview-container" class="hidden w-full h-full" style="background: var(--bg-primary);">
+                        <img id="cropper-img" src="" style="display: block; max-width: 100%;">
+                    </div>
+                </div>
+                <div class="glass-panel">
+                    <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">Aspect Ratio</h3>
+                    <div id="cropper-controls" style="opacity: 0.5; pointer-events: none; display: flex; flex-direction: column; gap: 0.5rem;">
+                        <button onclick="cropperApp.setRatio(NaN)" class="btn btn-secondary w-full" style="justify-content: flex-start;">Free</button>
+                        <button onclick="cropperApp.setRatio(1)" class="btn btn-secondary w-full" style="justify-content: flex-start;">1:1 (Square)</button>
+                        <button onclick="cropperApp.setRatio(16/9)" class="btn btn-secondary w-full" style="justify-content: flex-start;">16:9 (Landscape)</button>
+                        <button onclick="cropperApp.setRatio(9/16)" class="btn btn-secondary w-full" style="justify-content: flex-start;">9:16 (Portrait)</button>
+                        <button onclick="cropperApp.setRatio(4/3)" class="btn btn-secondary w-full" style="justify-content: flex-start;">4:3</button>
+                        
+                        <button id="cropper-download-btn" class="btn btn-primary w-full" style="background: #f97316; margin-top: 1rem;">
+                            <i class="ph-bold ph-download-simple"></i> Download Cropped
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Palette Extractor -->
+        <div id="view-palette" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div>
+                    <h2 class="view-title">Palette Extractor</h2>
+                    <p class="view-subtitle">Extract beautiful color palettes</p>
+                </div>
+                <button onclick="paletteApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            <div class="layout-split">
+                <div id="palette-drop-zone" class="drop-zone">
+                    <input type="file" id="palette-input" accept="image/*">
+                    <div id="palette-placeholder">
+                        <div class="tool-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6; margin: 0 auto 1rem;"><i class="ph-bold ph-eyedropper"></i></div>
+                        <h3 style="font-size: 1.25rem;">Drop image here</h3>
+                    </div>
+                    <div id="palette-preview-container" class="hidden w-full flex items-center justify-center">
+                        <img id="palette-img" class="preview-img" src="" alt="Preview">
+                    </div>
+                </div>
+                <div class="glass-panel flex" style="flex-direction: column;">
+                    <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">Extracted Palette</h3>
+                    <div id="palette-results" class="hidden" style="flex-grow: 1;">
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Dominant Color</p>
+                        <div id="palette-dominant" class="color-swatch-large" style="height: 60px; border-radius: 8px; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.5); font-weight: bold; border: 1px solid rgba(0,0,0,0.1);"></div>
+                        
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Palette (Click to Copy)</p>
+                        <div id="palette-grid" class="grid" style="grid-template-columns: repeat(5, 1fr); gap: 0.5rem;">
+                            <!-- Swatches injected here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Compressor -->
+        <div id="view-compressor" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div>
+                    <h2 class="view-title">Image Compressor</h2>
+                    <p class="view-subtitle">Reduce file size intelligently</p>
+                </div>
+                <button onclick="compressorApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            <div class="layout-split">
+                <div id="compressor-drop-zone" class="drop-zone">
+                    <input type="file" id="compressor-input" accept="image/*">
+                    <div id="compressor-placeholder">
+                        <div class="tool-icon" style="background: rgba(132, 204, 22, 0.1); color: #84cc16; margin: 0 auto 1rem;"><i class="ph-bold ph-file-archive"></i></div>
+                        <h3 style="font-size: 1.25rem;">Drop image here</h3>
+                    </div>
+                    <div id="compressor-preview-container" class="hidden w-full flex items-center justify-center">
+                        <img id="compressor-preview" class="preview-img" src="" alt="Preview">
+                    </div>
+                </div>
+                <div class="glass-panel">
+                    <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">Settings</h3>
+                    <div id="compressor-controls" style="opacity: 0.5; pointer-events: none;">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">Original Size: <span id="comp-orig-size" style="font-weight: 600;">0 KB</span></p>
+                        
+                        <div class="input-group" style="margin-top: 1rem;">
+                            <label class="input-label">Max File Size (MB)</label>
+                            <input type="number" id="compressor-max-mb" class="input-field" value="1" step="0.1" min="0.1">
+                        </div>
+                        
+                        <div id="compressor-loader" class="hidden text-center" style="margin: 1rem 0;">
+                            <div class="loader" style="border-top-color: #84cc16; width: 20px; height: 20px; border-width: 2px;"></div>
+                        </div>
+
+                        <div id="compressor-result" class="hidden" style="background: rgba(132, 204, 22, 0.1); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; text-align: center;">
+                            <p style="font-size: 0.8rem; color: var(--text-secondary);">Compressed Size</p>
+                            <p id="comp-new-size" style="font-size: 1.25rem; font-weight: bold; color: #65a30d;">0 KB</p>
+                            <p id="comp-savings" style="font-size: 0.8rem; color: #65a30d;">Saved 0%</p>
+                        </div>
+                        
+                        <button id="compressor-btn" class="btn btn-primary w-full" style="background: #84cc16;">
+                            <i class="ph-bold ph-arrows-in"></i> Compress
+                        </button>
+                        <button id="compressor-download-btn" class="btn btn-secondary w-full hidden" style="margin-top: 0.5rem; background: #84cc16; color: white;">
+                            <i class="ph-bold ph-download-simple"></i> Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="container" style="padding: 0;">
+            <p>© 2026 Avara. Built with Vanilla CSS.</p>
+        </div>
+    </footer>
+
+    <!-- App Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
