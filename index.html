@@ -19,6 +19,8 @@
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     
     <!-- New Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.4.0/color-thief.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
@@ -137,6 +139,49 @@
                         <h3>Image Compressor</h3>
                         <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Reduce file size without losing quality.</p>
                     </div>
+
+                    <!-- Even Newer Tools -->
+                    <div onclick="router.navigate('pdfmergesplit')" class="glass-panel tool-card">
+                        <div class="tool-icon" style="background: rgba(220, 38, 38, 0.1); color: #dc2626;"><i class="ph-bold ph-files"></i></div>
+                        <h3>Merge / Split PDF</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Combine or separate PDF pages.</p>
+                    </div>
+
+                    <div onclick="router.navigate('pdfcompressor')" class="glass-panel tool-card">
+                        <div class="tool-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="ph-bold ph-file-zip"></i></div>
+                        <h3>PDF Optimizer</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Clean and reduce PDF file size.</p>
+                    </div>
+
+                    <div onclick="router.navigate('pdfconverter')" class="glass-panel tool-card">
+                        <div class="tool-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;"><i class="ph-bold ph-file-doc"></i></div>
+                        <h3>PDF to Word/Text</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Extract text and convert PDFs.</p>
+                    </div>
+
+                    <div onclick="router.navigate('annotator')" class="glass-panel tool-card">
+                        <div class="tool-icon" style="background: rgba(234, 179, 8, 0.1); color: #eab308;"><i class="ph-bold ph-highlighter-circle"></i></div>
+                        <h3>Highlighter</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Highlight and annotate images/PDFs.</p>
+                    </div>
+
+                    <div onclick="router.navigate('handwriting')" class="glass-panel tool-card">
+                        <div class="tool-icon" style="background: rgba(147, 51, 234, 0.1); color: #9333ea;"><i class="ph-bold ph-signature"></i></div>
+                        <h3>Handwriting OCR</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Convert handwritten notes to text.</p>
+                    </div>
+
+                    <div onclick="router.navigate('pdfsign')" class="glass-panel tool-card">
+                        <div class="tool-icon" style="background: rgba(71, 85, 105, 0.1); color: #475569;"><i class="ph-bold ph-pen-nib"></i></div>
+                        <h3>Sign PDF</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Draw and add your signature to a PDF.</p>
+                    </div>
+
+                    <div onclick="router.navigate('pdfprotect')" class="glass-panel tool-card">
+                        <div class="tool-icon" style="background: rgba(225, 29, 72, 0.1); color: #e11d48;"><i class="ph-bold ph-lock-key"></i></div>
+                        <h3>Protect / Unlock PDF</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Add or remove PDF passwords.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -145,9 +190,12 @@
         
         <div id="view-resizer" class="view-section hidden fade-enter">
             <div class="view-header">
-                <div>
-                    <h2 class="view-title">Image Resizer</h2>
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">Image Resizer</h2>
                     <p class="view-subtitle">Adjust dimensions maintaining quality</p>
+                </div>
                 </div>
                 <button onclick="resizerApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
                     <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
@@ -200,9 +248,12 @@
 
         <div id="view-pdf" class="view-section hidden fade-enter">
             <div class="view-header">
-                <div>
-                    <h2 class="view-title">PDF to Image</h2>
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">PDF to Image</h2>
                     <p class="view-subtitle">Extract pages securely</p>
+                </div>
                 </div>
                 <button onclick="pdfApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
                     <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
@@ -244,9 +295,12 @@
 
         <div id="view-img2pdf" class="view-section hidden fade-enter">
             <div class="view-header">
-                <div>
-                    <h2 class="view-title">Images to PDF</h2>
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">Images to PDF</h2>
                     <p class="view-subtitle">Combine images into a document</p>
+                </div>
                 </div>
                 <button onclick="imgToPdfApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
                     <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
@@ -279,9 +333,12 @@
 
         <div id="view-vectorizer" class="view-section hidden fade-enter">
             <div class="view-header">
-                <div>
-                    <h2 class="view-title">Image Vectorizer</h2>
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">Image Vectorizer</h2>
                     <p class="view-subtitle">Convert Raster (JPG/PNG) to Vector (SVG)</p>
+                </div>
                 </div>
                 <button onclick="vectorizerApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
                     <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
@@ -314,9 +371,12 @@
 
         <div id="view-ocr" class="view-section hidden fade-enter">
             <div class="view-header">
-                <div>
-                    <h2 class="view-title">Text Extractor</h2>
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">Text Extractor</h2>
                     <p class="view-subtitle">Extract text from images (OCR)</p>
+                </div>
                 </div>
                 <button onclick="ocrApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
                     <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
@@ -338,7 +398,12 @@
                     <div class="glass-panel" style="padding: 0; display: flex; flex-direction: column; flex-grow: 1; overflow: hidden;">
                         <div class="text-box-header">
                             <span>Extracted Text</span>
+                            
+                            <button id="ocr-cleanup-btn" onclick="ocrApp.cleanupText()" class="copy-btn" style="margin-right: 0.5rem; color: #10b981;">
+                                <i class="ph-bold ph-magic-wand"></i> Clean Up
+                            </button>
                             <button id="ocr-copy-btn" onclick="ocrApp.copyText()" class="copy-btn">
+
                                 <i class="ph-bold ph-copy"></i> Copy
                             </button>
                         </div>
@@ -362,9 +427,12 @@
         <!-- Background Remover -->
         <div id="view-bgremover" class="view-section hidden fade-enter">
             <div class="view-header">
-                <div>
-                    <h2 class="view-title">Background Remover</h2>
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">Background Remover</h2>
                     <p class="view-subtitle">Remove backgrounds instantly using AI</p>
+                </div>
                 </div>
                 <button onclick="bgRemoverApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
                     <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
@@ -396,9 +464,12 @@
         <!-- Image Upscaler -->
         <div id="view-upscaler" class="view-section hidden fade-enter">
             <div class="view-header">
-                <div>
-                    <h2 class="view-title">Image Upscaler</h2>
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">Image Upscaler</h2>
                     <p class="view-subtitle">High-quality enlargement (Lanczos)</p>
+                </div>
                 </div>
                 <button onclick="upscalerApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
                     <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
@@ -444,9 +515,12 @@
         <!-- Image Denoiser -->
         <div id="view-denoiser" class="view-section hidden fade-enter">
             <div class="view-header">
-                <div>
-                    <h2 class="view-title">Image Denoiser</h2>
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">Image Denoiser</h2>
                     <p class="view-subtitle">Smooth out grain and noise</p>
+                </div>
                 </div>
                 <button onclick="denoiserApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
                     <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
@@ -481,9 +555,12 @@
         <!-- Colorize B&W -->
         <div id="view-colorize" class="view-section hidden fade-enter">
             <div class="view-header">
-                <div>
-                    <h2 class="view-title">Color Tinting</h2>
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">Color Tinting</h2>
                     <p class="view-subtitle">Apply artistic color tints to B&W photos</p>
+                </div>
                 </div>
                 <button onclick="colorizeApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
                     <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
@@ -522,9 +599,12 @@
         <!-- Face Blur -->
         <div id="view-faceblur" class="view-section hidden fade-enter">
             <div class="view-header">
-                <div>
-                    <h2 class="view-title">Face Blur</h2>
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">Face Blur</h2>
                     <p class="view-subtitle">Automatically detect and blur faces</p>
+                </div>
                 </div>
                 <button onclick="faceBlurApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
                     <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
@@ -555,9 +635,12 @@
         <!-- Image Crop -->
         <div id="view-cropper" class="view-section hidden fade-enter">
             <div class="view-header">
-                <div>
-                    <h2 class="view-title">Image Cropper</h2>
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">Image Cropper</h2>
                     <p class="view-subtitle">Crop with precise aspect ratios</p>
+                </div>
                 </div>
                 <button onclick="cropperApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
                     <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
@@ -594,9 +677,12 @@
         <!-- Palette Extractor -->
         <div id="view-palette" class="view-section hidden fade-enter">
             <div class="view-header">
-                <div>
-                    <h2 class="view-title">Palette Extractor</h2>
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">Palette Extractor</h2>
                     <p class="view-subtitle">Extract beautiful color palettes</p>
+                </div>
                 </div>
                 <button onclick="paletteApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
                     <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
@@ -631,9 +717,12 @@
         <!-- Image Compressor -->
         <div id="view-compressor" class="view-section hidden fade-enter">
             <div class="view-header">
-                <div>
-                    <h2 class="view-title">Image Compressor</h2>
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">Image Compressor</h2>
                     <p class="view-subtitle">Reduce file size intelligently</p>
+                </div>
                 </div>
                 <button onclick="compressorApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
                     <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
@@ -678,6 +767,339 @@
                         </button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+    
+        <!-- PDF Merge / Split -->
+        <div id="view-pdfmergesplit" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">PDF Merge / Split</h2>
+                        <p class="view-subtitle">Combine or extract PDF pages</p>
+                    </div>
+                </div>
+                <button onclick="pdfMergeSplitApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            
+            <div class="flex" style="gap: 1rem; margin-bottom: 1.5rem;">
+                <button onclick="pdfMergeSplitApp.setMode('merge')" id="pms-mode-merge" class="btn btn-primary" style="flex: 1;">Merge PDFs</button>
+                <button onclick="pdfMergeSplitApp.setMode('split')" id="pms-mode-split" class="btn btn-secondary" style="flex: 1;">Split PDF</button>
+            </div>
+
+            <div id="pms-merge-view">
+                <div id="pms-drop-zone-merge" class="drop-zone" style="min-height: 200px;">
+                    <input type="file" id="pms-input-merge" accept="application/pdf" multiple>
+                    <div class="tool-icon" style="background: rgba(220, 38, 38, 0.1); color: #dc2626; margin: 0 auto 1rem;"><i class="ph-bold ph-files"></i></div>
+                    <h3 style="font-size: 1.25rem;">Select PDFs to Merge</h3>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem;">Select multiple or drag and drop</p>
+                </div>
+                <div id="pms-merge-list" class="gallery-grid" style="grid-template-columns: 1fr; gap: 0.5rem; margin-top: 1rem;"></div>
+                <button id="pms-merge-btn" class="btn btn-primary w-full hidden" style="margin-top: 1.5rem; background: #dc2626;">
+                    <i class="ph-bold ph-link"></i> Merge & Download
+                </button>
+            </div>
+
+            <div id="pms-split-view" class="hidden">
+                <div id="pms-drop-zone-split" class="drop-zone" style="min-height: 200px;">
+                    <input type="file" id="pms-input-split" accept="application/pdf">
+                    <div class="tool-icon" style="background: rgba(220, 38, 38, 0.1); color: #dc2626; margin: 0 auto 1rem;"><i class="ph-bold ph-scissors"></i></div>
+                    <h3 style="font-size: 1.25rem;">Select PDF to Split</h3>
+                </div>
+                <div id="pms-split-controls" class="hidden glass-panel" style="margin-top: 1rem;">
+                    <p style="margin-bottom: 1rem; font-weight: 600;">Pages: <span id="pms-split-total"></span></p>
+                    <div class="input-group">
+                        <label class="input-label">Pages to extract (e.g., 1-3, 5)</label>
+                        <input type="text" id="pms-split-pages" class="input-field" placeholder="1-3, 5">
+                    </div>
+                    <button id="pms-split-btn" class="btn btn-primary w-full" style="margin-top: 0.5rem; background: #dc2626;">
+                        <i class="ph-bold ph-scissors"></i> Split & Download
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PDF Compressor -->
+        <div id="view-pdfcompressor" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">PDF Optimizer</h2>
+                        <p class="view-subtitle">Clean metadata and unused objects</p>
+                    </div>
+                </div>
+                <button onclick="pdfCompressorApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            
+            <div id="pdfcomp-drop-zone" class="drop-zone" style="min-height: 300px;">
+                <input type="file" id="pdfcomp-input" accept="application/pdf">
+                <div id="pdfcomp-placeholder">
+                    <div class="tool-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981; margin: 0 auto 1rem;"><i class="ph-bold ph-file-zip"></i></div>
+                    <h3 style="font-size: 1.25rem;">Select PDF to Optimize</h3>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem;">Strips unused objects to save space</p>
+                </div>
+                <div id="pdfcomp-loader" class="hidden">
+                    <div class="loader" style="border-top-color: #10b981;"></div>
+                    <p>Optimizing...</p>
+                </div>
+                <div id="pdfcomp-result" class="hidden" style="text-align: center;">
+                    <i class="ph-fill ph-check-circle" style="font-size: 3rem; color: #10b981; margin-bottom: 1rem;"></i>
+                    <p style="margin-bottom: 0.5rem;">Original: <span id="pdfcomp-orig-size" style="font-weight: 600;"></span></p>
+                    <p style="margin-bottom: 1.5rem;">Optimized: <span id="pdfcomp-new-size" style="font-weight: 600; color: #10b981;"></span></p>
+                    <button id="pdfcomp-download-btn" class="btn btn-primary" style="background: #10b981;">Download Optimized PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PDF to Word/Text -->
+        <div id="view-pdfconverter" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">PDF Converter</h2>
+                        <p class="view-subtitle">Extract to Word or Text</p>
+                    </div>
+                </div>
+                <button onclick="pdfConverterApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            
+            <div class="layout-split">
+                <div id="pdfconv-drop-zone" class="drop-zone">
+                    <input type="file" id="pdfconv-input" accept="application/pdf">
+                    <div id="pdfconv-placeholder">
+                        <div class="tool-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; margin: 0 auto 1rem;"><i class="ph-bold ph-file-doc"></i></div>
+                        <h3 style="font-size: 1.25rem;">Upload PDF</h3>
+                    </div>
+                    <div id="pdfconv-loader" class="hidden text-center">
+                        <div class="loader" style="border-top-color: #2563eb;"></div>
+                        <p>Extracting text...</p>
+                        <div class="progress-container" style="width: 150px; margin-top: 1rem; margin-left: auto; margin-right: auto;"><div id="pdfconv-progress" class="progress-bar" style="background: #2563eb; width: 0%;"></div></div>
+                    </div>
+                </div>
+                <div class="glass-panel flex" style="flex-direction: column;">
+                    <h3 style="margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">Options</h3>
+                    <div id="pdfconv-controls" style="opacity: 0.5; pointer-events: none; flex-grow: 1;">
+                        <button id="pdfconv-word-btn" class="btn btn-primary w-full" style="margin-bottom: 1rem; background: #2563eb;">
+                            <i class="ph-bold ph-file-doc"></i> Save as Word (.docx)
+                        </button>
+                        <button id="pdfconv-text-btn" class="btn btn-secondary w-full">
+                            <i class="ph-bold ph-file-text"></i> Save as Text (.txt)
+                        </button>
+                        
+                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 1.5rem;">
+                            Note: This extracts selectable text. Scanned images inside PDFs will be ignored.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Highlighter & Annotator -->
+        <div id="view-annotator" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">Annotator</h2>
+                        <p class="view-subtitle">Highlight and draw on images/PDFs</p>
+                    </div>
+                </div>
+                <button onclick="annotatorApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            
+            <div id="anno-upload-section">
+                <div id="anno-drop-zone" class="drop-zone">
+                    <input type="file" id="anno-input" accept="image/*,application/pdf">
+                    <div class="tool-icon" style="background: rgba(234, 179, 8, 0.1); color: #eab308; margin: 0 auto 1rem;"><i class="ph-bold ph-highlighter-circle"></i></div>
+                    <h3 style="font-size: 1.25rem;">Upload Image or PDF</h3>
+                </div>
+            </div>
+            
+            <div id="anno-workspace" class="hidden">
+                <div class="glass-panel flex" style="gap: 1rem; margin-bottom: 1rem; padding: 1rem; justify-content: center;">
+                    <button onclick="annotatorApp.setTool('highlighter')" id="anno-tool-hl" class="btn btn-primary" style="background: #eab308;">Highlighter</button>
+                    <button onclick="annotatorApp.setTool('pen')" id="anno-tool-pen" class="btn btn-secondary">Pen</button>
+                    <div style="width: 1px; background: var(--glass-border); margin: 0 0.5rem;"></div>
+                    <input type="color" id="anno-color" value="#eab308" style="width: 40px; height: 40px; border-radius: 8px; border: none; cursor: pointer;">
+                    <button onclick="annotatorApp.undo()" class="btn btn-secondary"><i class="ph-bold ph-arrow-u-up-left"></i></button>
+                    <button id="anno-download-btn" class="btn btn-primary"><i class="ph-bold ph-download-simple"></i> Save</button>
+                </div>
+                <div id="anno-canvas-container" class="glass-panel" style="display: flex; justify-content: center; overflow: auto; max-height: 60vh; padding: 0;">
+                    <canvas id="anno-canvas" style="cursor: crosshair; max-width: 100%;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Handwriting OCR -->
+        <div id="view-handwriting" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">Handwriting OCR</h2>
+                        <p class="view-subtitle">Optimized for handwritten notes</p>
+                    </div>
+                </div>
+                <button onclick="handwritingApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            
+            <div class="layout-split">
+                <div id="hw-drop-zone" class="drop-zone">
+                    <input type="file" id="hw-input" accept="image/*">
+                    <div id="hw-placeholder">
+                        <div class="tool-icon" style="background: rgba(147, 51, 234, 0.1); color: #9333ea; margin: 0 auto 1rem;"><i class="ph-bold ph-signature"></i></div>
+                        <h3 style="font-size: 1.25rem;">Upload Note Image</h3>
+                    </div>
+                    <div id="hw-preview-container" class="hidden w-full flex items-center justify-center">
+                        <canvas id="hw-preview-canvas" class="preview-img"></canvas>
+                    </div>
+                </div>
+                <div class="glass-panel flex" style="flex-direction: column; padding: 0;">
+                    <div class="text-box-header">
+                        <span>Extracted Text</span>
+                        <div>
+                            <button onclick="handwritingApp.cleanupText()" class="copy-btn" style="display:inline-flex; margin-right: 0.5rem; color: #10b981;"><i class="ph-bold ph-magic-wand"></i></button>
+                            <button onclick="handwritingApp.copyText()" class="copy-btn" style="display:inline-flex;"><i class="ph-bold ph-copy"></i></button>
+                        </div>
+                    </div>
+                    <div style="position: relative; flex-grow: 1; display: flex;">
+                        <textarea id="hw-result" class="text-box" placeholder="Extracted handwriting will appear here..." readonly></textarea>
+                        <div id="hw-loader" class="hidden" style="position: absolute; inset: 0; background: var(--glass-bg); backdrop-filter: blur(4px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10;">
+                            <div class="loader" style="border-top-color: #9333ea;"></div>
+                            <p style="font-weight: 500;">Analyzing handwriting...</p>
+                            <div class="progress-container" style="width: 150px; margin-top: 1rem;">
+                                <div id="hw-progress-bar" class="progress-bar" style="background: #9333ea;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="glass-panel" style="margin-top: 1.5rem;">
+                <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Pre-processing Controls</h3>
+                <div class="flex items-center gap-4">
+                    <div class="input-group" style="flex: 1; margin: 0;">
+                        <label class="input-label">Contrast</label>
+                        <input type="range" id="hw-contrast" min="0" max="200" value="100">
+                    </div>
+                    <div class="input-group" style="flex: 1; margin: 0;">
+                        <label class="input-label">Brightness</label>
+                        <input type="range" id="hw-brightness" min="-100" max="100" value="0">
+                    </div>
+                    <button onclick="handwritingApp.process()" class="btn btn-primary" style="background: #9333ea; margin-top: 1rem;">Run OCR</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PDF Signature -->
+        <div id="view-pdfsign" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">Sign PDF</h2>
+                        <p class="view-subtitle">Add your signature to a document</p>
+                    </div>
+                </div>
+                <button onclick="pdfSignApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            
+            <div id="sign-upload-section">
+                <div id="sign-drop-zone" class="drop-zone">
+                    <input type="file" id="sign-input" accept="application/pdf">
+                    <div class="tool-icon" style="background: rgba(71, 85, 105, 0.1); color: #475569; margin: 0 auto 1rem;"><i class="ph-bold ph-pen-nib"></i></div>
+                    <h3 style="font-size: 1.25rem;">Upload PDF to Sign</h3>
+                </div>
+            </div>
+            
+            <div id="sign-workspace" class="hidden layout-split">
+                <div class="glass-panel" style="padding: 1rem; overflow: auto; max-height: 70vh;">
+                    <div id="sign-pdf-container" style="position: relative; display: inline-block;">
+                        <canvas id="sign-pdf-canvas" style="border: 1px solid var(--glass-border);"></canvas>
+                        <div id="sign-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; cursor: crosshair;"></div>
+                    </div>
+                    <div class="flex justify-center gap-4" style="margin-top: 1rem;">
+                        <button onclick="pdfSignApp.prevPage()" class="btn btn-secondary"><i class="ph-bold ph-arrow-left"></i></button>
+                        <span id="sign-page-info" style="line-height: 2.5rem;">Page 1 / 1</span>
+                        <button onclick="pdfSignApp.nextPage()" class="btn btn-secondary"><i class="ph-bold ph-arrow-right"></i></button>
+                    </div>
+                </div>
+                <div class="glass-panel flex" style="flex-direction: column;">
+                    <h3 style="margin-bottom: 1rem;">Draw Signature</h3>
+                    <div style="border: 1px solid var(--glass-border); border-radius: 8px; background: white; margin-bottom: 1rem;">
+                        <canvas id="sign-pad-canvas" width="300" height="150" style="cursor: crosshair; touch-action: none; width: 100%;"></canvas>
+                    </div>
+                    <div class="flex justify-between" style="margin-bottom: 1.5rem;">
+                        <button onclick="pdfSignApp.clearPad()" class="btn btn-secondary">Clear</button>
+                        <button onclick="pdfSignApp.placeSignature()" class="btn btn-primary" style="background: #475569;">Place on PDF</button>
+                    </div>
+                    
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                        1. Draw signature above.<br>2. Click 'Place on PDF'.<br>3. Click anywhere on the PDF page to stamp it.
+                    </p>
+                    
+                    <button id="sign-download-btn" onclick="pdfSignApp.download()" class="btn btn-primary w-full hidden" style="background: #10b981; margin-top: auto;">
+                        <i class="ph-bold ph-download-simple"></i> Download Signed PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PDF Protect / Unlock -->
+        <div id="view-pdfprotect" class="view-section hidden fade-enter">
+            <div class="view-header">
+                <div class="flex items-center" style="gap: 1rem;">
+                    <button onclick="router.navigate('home')" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-arrow-left"></i></button>
+                    <div>
+                        <h2 class="view-title">Protect / Unlock</h2>
+                        <p class="view-subtitle">Manage PDF passwords</p>
+                    </div>
+                </div>
+                <button onclick="pdfProtectApp.reset()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+                </button>
+            </div>
+            
+            <div class="flex" style="gap: 1rem; margin-bottom: 1.5rem;">
+                <button onclick="pdfProtectApp.setMode('protect')" id="prot-mode-protect" class="btn btn-primary" style="flex: 1; background: #e11d48;">Protect PDF</button>
+                <button onclick="pdfProtectApp.setMode('unlock')" id="prot-mode-unlock" class="btn btn-secondary" style="flex: 1;">Unlock PDF</button>
+            </div>
+
+            <div id="prot-drop-zone" class="drop-zone" style="min-height: 250px;">
+                <input type="file" id="prot-input" accept="application/pdf">
+                <div id="prot-placeholder">
+                    <div class="tool-icon" style="background: rgba(225, 29, 72, 0.1); color: #e11d48; margin: 0 auto 1rem;"><i class="ph-bold ph-lock-key"></i></div>
+                    <h3 id="prot-drop-title" style="font-size: 1.25rem;">Upload PDF to Protect</h3>
+                </div>
+                <div id="prot-file-info" class="hidden flex items-center justify-center gap-4">
+                    <i class="ph-fill ph-file-pdf" style="font-size: 2rem; color: #e11d48;"></i>
+                    <span id="prot-filename" style="font-weight: 600;"></span>
+                </div>
+            </div>
+            
+            <div id="prot-controls" class="hidden glass-panel" style="margin-top: 1.5rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+                <div class="input-group">
+                    <label id="prot-pwd-label" class="input-label">Enter Password</label>
+                    <input type="password" id="prot-password" class="input-field">
+                </div>
+                <button id="prot-action-btn" class="btn btn-primary w-full" style="background: #e11d48; margin-top: 1rem;">
+                    <i class="ph-bold ph-lock-key"></i> Apply
+                </button>
             </div>
         </div>
 

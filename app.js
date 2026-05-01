@@ -841,7 +841,31 @@ const ocrApp = {
         });
     },
 
+
+    cleanupText() {
+        const textElement = document.getElementById('ocr-result');
+        if(!textElement || !textElement.value) return;
+        
+        let text = textElement.value;
+        // Fix common OCR issues
+        text = text.replace(/([^\n])\n([^\n])/g, '$1 $2'); // remove single line breaks
+        text = text.replace(/\n{3,}/g, '\n\n'); // normalize multiple line breaks
+        text = text.replace(/([a-zA-Z])-\s+([a-zA-Z])/g, '$1$2'); // fix hyphenation
+        text = text.replace(/ {2,}/g, ' '); // remove multiple spaces
+        text = text.trim();
+        
+        textElement.value = text;
+        
+        const btn = document.getElementById('ocr-cleanup-btn');
+        if(btn) {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="ph-bold ph-check"></i> Cleaned!';
+            setTimeout(() => btn.innerHTML = original, 2000);
+        }
+    },
+
     async copyText() {
+
         const textElement = document.getElementById('ocr-result');
         if(!textElement || !textElement.value) return;
         
@@ -1437,6 +1461,13 @@ document.addEventListener('DOMContentLoaded', () => {
     cropperApp.init();
     paletteApp.init();
     compressorApp.init();
+    if(typeof pdfMergeSplitApp !== 'undefined') pdfMergeSplitApp.init();
+    if(typeof pdfCompressorApp !== 'undefined') pdfCompressorApp.init();
+    if(typeof pdfConverterApp !== 'undefined') pdfConverterApp.init();
+    if(typeof annotatorApp !== 'undefined') annotatorApp.init();
+    if(typeof handwritingApp !== 'undefined') handwritingApp.init();
+    if(typeof pdfSignApp !== 'undefined') pdfSignApp.init();
+    if(typeof pdfProtectApp !== 'undefined') pdfProtectApp.init();
 
     
     // Initialize initial views style
